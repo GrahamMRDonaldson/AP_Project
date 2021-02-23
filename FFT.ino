@@ -1,5 +1,5 @@
 // CHANGE THESE VARS
-float freq = 800;        // sampling Frequency rate
+float freq = 1100;        // sampling Frequency rate
 
 // DONT CHANGE THESE VARS
 int SIGNAL[20];       // we have a signal with 20 capture points
