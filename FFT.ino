@@ -1,5 +1,5 @@
 // CHANGE THESE VARS
-float freq = 1100;        // sampling Frequency rate
+float freq = 1100;        // sampling Frequency rate (at least double the max freq we should test (aka 550*2)
 
 // DONT CHANGE THESE VARS
 int SIGNAL[20];       // we have a signal with 20 capture points
