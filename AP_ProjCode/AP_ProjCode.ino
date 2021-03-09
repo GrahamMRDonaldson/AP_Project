@@ -2,6 +2,11 @@
 
 arduinoFFT FFT = arduinoFFT(); /* Create FFT object */
 
+// SAMPLE VARS
+float RegFreq[8] = {261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25 };      // regular values
+float PosFreq[8] = {274.7115, 308.343, 346.1115, 366.6915, 411.6, 462, 518.574, 549.4125}; // 5%
+float NegFreq[8] = {248.5485, 278.977, 313.1485, 331.7685, 372.4, 418, 469.186, 497.0875}; // -5%
+
 // CHANGE THESE VARS
 const uint16_t samples = 32; // 16, 32, 64, 128
 const double sampling = 1100;        // sampling Frequency rate (at least double the max freq we should test (aka 550*2) = 1100
@@ -10,16 +15,209 @@ const double sampling = 1100;        // sampling Frequency rate (at least double
 double RealSig[samples];
 double ImagSig[samples];
 uint8_t exponent;
-
-#define SCL_INDEX 0x00
-#define SCL_TIME 0x01
-#define SCL_FREQUENCY 0x02
-#define SCL_PLOT 0x03
+int sleep_time   = 100; // sleep time between each signal point 10Hz sampling @ 100,
 
 // PINS
 int PIN_IN = A1;
-int sleep_time   = 100; // sleep time between each signal point 10Hz sampling @ 100, 
+int LED_1 = 2; // LED Output
+int LED_2 = 3; // LED Output
+int LED_3 = 4; // LED Output
+int LED_4 = 5; // LED Output
+int LED_5 = 6; // LED Output
+int LED_6 = 7; // LED Output
+int LED_7 = 8; // LED Output
+int LED_8 = 9; // LED Output
 
+// updates the output of the LED's given a frequency
+bool Between(int note, double frequency){
+  if(note < 0)
+  {
+     return false;
+  }
+  if(note > 7)
+  {
+    return false;
+  }
+  if(frequency < PosFreq[note] && frequency > NegFreq[note])
+  {
+    return true;
+  }
+    
+  return false;
+}
+
+// returns note of closest frequency (1-8)
+int ClosestTo(double frequency) {
+  double BestDelta = 10000;
+  int BestNote = -1;
+  for(int i = 0; i < 8; i++)
+  {
+    double TargFreq = RegFreq[i];
+    double delta = abs(TargFreq - frequency);
+    if(delta < BestDelta)
+    {
+      BestDelta = delta;
+      BestNote = i;
+    }
+  }
+  return BestNote + 1;
+}
+
+void UpdateLED(double frequency){
+  static int PrevNote = 0;
+  int Note = 0;
+
+  if(Between(0, frequency))
+    Note = ClosestTo(frequency);
+  else if(Between(1, frequency))
+    Note = ClosestTo(frequency);
+  else if(Between(2, frequency))
+    Note = ClosestTo(frequency);
+  else if(Between(3, frequency))
+    Note = ClosestTo(frequency);
+  else if(Between(4, frequency))
+    Note = ClosestTo(frequency);
+  else if(Between(5, frequency))
+    Note = ClosestTo(frequency);
+  else if(Between(6, frequency))
+    Note = ClosestTo(frequency);
+  else if(Between(7, frequency))
+    Note = ClosestTo(frequency);
+
+  Serial.print("NOTE:\t");
+  Serial.print(frequency);
+  Serial.print("\t");
+  switch (Note) {
+    case 1:
+      Serial.println("C-LOW");
+      break;
+    case 2:
+      Serial.println("D");
+      break;
+    case 3:
+      Serial.println("E");
+      break;
+    case 4:
+      Serial.println("F");
+      break;
+    case 5:
+      Serial.println("G");
+      break;
+    case 6:
+      Serial.println("A");
+      break;
+    case 7:
+      Serial.println("B");
+      break;
+    case 8:
+      Serial.println("C-HIGH");
+      break;
+    default:
+      Serial.println("InValid");
+      break;
+  }
+   
+
+  // Make it so LED's only change on state change
+  if(Note == PrevNote)
+    return;
+
+  PrevNote = Note;
+  switch (Note) {
+  case 1:
+    digitalWrite(LED_1, HIGH);
+    digitalWrite(LED_2, LOW);
+    digitalWrite(LED_3, LOW);
+    digitalWrite(LED_4, LOW);
+    digitalWrite(LED_5, LOW);
+    digitalWrite(LED_6, LOW);
+    digitalWrite(LED_7, LOW);
+    digitalWrite(LED_8, LOW);
+    break;
+  case 2:
+    digitalWrite(LED_2, HIGH);
+    digitalWrite(LED_1, LOW);
+    digitalWrite(LED_3, LOW);
+    digitalWrite(LED_4, LOW);
+    digitalWrite(LED_5, LOW);
+    digitalWrite(LED_6, LOW);
+    digitalWrite(LED_7, LOW);
+    digitalWrite(LED_8, LOW);
+    break;
+  case 3:
+    digitalWrite(LED_3, HIGH);
+    digitalWrite(LED_1, LOW);
+    digitalWrite(LED_2, LOW);
+    digitalWrite(LED_4, LOW);
+    digitalWrite(LED_5, LOW);
+    digitalWrite(LED_6, LOW);
+    digitalWrite(LED_7, LOW);
+    digitalWrite(LED_8, LOW);
+    break;
+  case 4:
+    digitalWrite(LED_4, HIGH);
+    digitalWrite(LED_1, LOW);
+    digitalWrite(LED_2, LOW);
+    digitalWrite(LED_3, LOW);
+    digitalWrite(LED_5, LOW);
+    digitalWrite(LED_6, LOW);
+    digitalWrite(LED_7, LOW);
+    digitalWrite(LED_8, LOW);
+    break;
+  case 5:
+    digitalWrite(LED_5, HIGH);
+    digitalWrite(LED_1, LOW);
+    digitalWrite(LED_2, LOW);
+    digitalWrite(LED_3, LOW);
+    digitalWrite(LED_4, LOW);
+    digitalWrite(LED_6, LOW);
+    digitalWrite(LED_7, LOW);
+    digitalWrite(LED_8, LOW);
+    break;
+  case 6:
+    digitalWrite(LED_6, HIGH);
+    digitalWrite(LED_1, LOW);
+    digitalWrite(LED_2, LOW);
+    digitalWrite(LED_3, LOW);
+    digitalWrite(LED_4, LOW);
+    digitalWrite(LED_5, LOW);
+    digitalWrite(LED_7, LOW);
+    digitalWrite(LED_8, LOW);
+    break;
+  case 7:
+    digitalWrite(LED_7, HIGH);
+    digitalWrite(LED_1, LOW);
+    digitalWrite(LED_2, LOW);
+    digitalWrite(LED_3, LOW);
+    digitalWrite(LED_4, LOW);
+    digitalWrite(LED_5, LOW);
+    digitalWrite(LED_6, LOW);
+    digitalWrite(LED_8, LOW);
+    break;
+  case 8:
+    digitalWrite(LED_8, HIGH);
+    digitalWrite(LED_1, LOW);
+    digitalWrite(LED_2, LOW);
+    digitalWrite(LED_3, LOW);
+    digitalWrite(LED_4, LOW);
+    digitalWrite(LED_5, LOW);
+    digitalWrite(LED_6, LOW);
+    digitalWrite(LED_7, LOW);
+    break;
+  default:
+    digitalWrite(LED_1, LOW);
+    digitalWrite(LED_2, LOW);
+    digitalWrite(LED_3, LOW);
+    digitalWrite(LED_4, LOW);
+    digitalWrite(LED_5, LOW);
+    digitalWrite(LED_6, LOW);
+    digitalWrite(LED_7, LOW);
+    digitalWrite(LED_8, LOW);
+    break;
+  }
+}
+
+// SETUP
 void setup() {
   Serial.begin(9600);           //  setup serial
   sleep_time = 1 / (sampling / 1000);
@@ -28,8 +226,7 @@ void setup() {
 }
 
 // GET SOME VALUES FROM SIGNAL (0-19)
-void UpdateSIGNAL()
-{
+void UpdateSIGNAL() {
   for (int i = 0; i < 20; i++) {
     RealSig[i] = analogRead(PIN_IN); // get the value in
     ImagSig[i] = 0;
@@ -38,8 +235,8 @@ void UpdateSIGNAL()
   }
 }
 
-void SimSignal(double frequency)
-{
+// Simulate Signal
+void SimSignal(double frequency) {
   double cycles = (((samples-1) * frequency) / sampling);
   for (uint16_t i = 0; i < samples; i++)
   {
@@ -49,16 +246,19 @@ void SimSignal(double frequency)
 }
 
 void loop() {
-  // Get Signal
-  //UpdateSIGNAL();
-  while(true)
-  { 
-    SimSignal(550.0); // A
-    
+  double LowFreq = 200;
+  double HighFreq = 600;
+  for(double i = LowFreq; i < HighFreq; i++)
+  {
+    //UpdateSIGNAL();
+    SimSignal(i); // A
+
     FFT.Windowing(RealSig, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);  /* Weigh data */
     FFT.Compute(RealSig, ImagSig, samples, exponent, FFT_FORWARD); /* Compute FFT */
     FFT.ComplexToMagnitude(RealSig, ImagSig, samples); /* Compute magnitudes */
     double x = FFT.MajorPeak(RealSig, samples, sampling);
-    Serial.println(x);
+
+    UpdateLED(x);
   }
+  while(1);
 }
