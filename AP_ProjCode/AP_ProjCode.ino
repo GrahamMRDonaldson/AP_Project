@@ -8,8 +8,8 @@ float PosFreq[8] = {274.7115, 308.343, 346.1115, 366.6915, 411.6, 462, 518.574, 
 float NegFreq[8] = {248.5485, 278.977, 313.1485, 331.7685, 372.4, 418, 469.186, 497.0875}; // -5%
 
 // CHANGE THESE VARS
-const uint16_t samples = 64; // 16, 32, 64, 128
-const double sampling = 2000;        // sampling Frequency rate (at least double the max freq we should test (aka 550*2) = 1100
+const uint16_t samples = 128; // 16, 32, 64, 128
+const double sampling = 1100;        // sampling Frequency rate (at least double the max freq we should test (aka 550*2) = 1100
 
 // DONT CHANGE THESE VARS
 double RealSig[samples];
@@ -234,8 +234,8 @@ void UpdateSIGNAL() {
   for (int i = 0; i < samples; i++) {
     microseconds = micros();    //Overflows after around 70 minutes!
     RealSig[i] = analogRead(PIN_IN); // get the value in
-    if(RealSig[i] < 20) // get rid of noise
-      RealSig[i] = 0;
+    //if(RealSig[i] < 20) // get rid of noise
+    //qqq  RealSig[i] = 0;
     ImagSig[i] = 0;
     //Serial.println(RealSig[i]); // print it
     while(micros() < (microseconds + sampling_period_us)){
@@ -255,12 +255,12 @@ void SimSignal(double frequency) {
 }
 
 void loop() {
-    UpdateSIGNAL();
-
-    FFT.Windowing(RealSig, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);  /* Weigh data */
-    FFT.Compute(RealSig, ImagSig, samples, FFT_FORWARD); /* Compute FFT */
-    FFT.ComplexToMagnitude(RealSig, ImagSig, samples); /* Compute magnitudes */
-    double x = FFT.MajorPeak(RealSig, samples, sampling) - 5;
-    Serial.println(x); // print it
-    UpdateLED(x);
+  UpdateSIGNAL();
+  FFT.Windowing(RealSig, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);  
+  FFT.Compute(RealSig, ImagSig, samples, FFT_FORWARD); 
+  FFT.ComplexToMagnitude(RealSig, ImagSig, samples); 
+  double x = FFT.MajorPeak(RealSig, samples, sampling) - 5;
+  Serial.println(x); // print it
+  UpdateLED(x);
+    
 }

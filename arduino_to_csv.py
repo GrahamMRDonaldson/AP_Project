@@ -19,12 +19,12 @@ def RemoveInvalidChars(s):
     for char in s:
         if char in a:
             newstr += char
-    if(len(newstr) > 0):
-        print(newstr)
     return newstr
 
 while True:
-    line = arduino_port.readline ()
-    RemoveInvalidChars(line)
-    #print()
-    # whatever you want to do here...
+    line = arduino_port.readline()
+    strval = RemoveInvalidChars(line)
+    # IF WE GET NUMBER 
+    if(len(strval) > 0):
+        val = float(strval)
+        print(val)
